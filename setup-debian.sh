@@ -1075,13 +1075,15 @@ END
 	chmod  +x /etc/init.d/3proxy
 	cat > "/etc/init.d/3proxy" <<END
 #!/bin/sh
-#
-# chkconfig: 2345 20 80
-# description: 3proxy tiny proxy server
-#
-#
-#
-#
+### BEGIN INIT INFO
+# Provides:     3Proxy
+# Required-Start:       $local fs $remote fs $network
+# Required-Stop:
+# Default-Start:     s
+# Default-Stop:
+# Short-Description: Initialize 3proxy server
+# Description:
+### END INIT INFO
 
 case "\$1" in
    start)
