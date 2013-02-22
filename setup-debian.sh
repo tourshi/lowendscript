@@ -1083,7 +1083,7 @@ END
 # Default-Stop:
 # Short-Description: Initialize 3proxy server
 # Description:
-### END INIT INFO
+### FINISH INIT INFO
 
 case "\$1" in
    start)
