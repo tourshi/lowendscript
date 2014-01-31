@@ -1124,15 +1124,14 @@ END
 	touch /etc/init.d/3proxy
 	chmod  +x /etc/init.d/3proxy
 	cat > "/etc/init.d/3proxy" <<END
-#!/bin/sh
 ### BEGIN INIT INFO
-# Provides:     3Proxy
-# Required-Start:       $local fs $remote fs $network
-# Required-Stop:
-# Default-Start:     s
-# Default-Stop:
-# Short-Description: Initialize 3proxy server
-# Description:
+# Provides:          3proxy
+# Required-Start:    \$remote_fs \$syslog
+# Required-Stop:     \$remote_fs \$syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start 3proxy daemon at boot time
+# Description:       Enable service provided by daemon.
 ### END INIT INFO
 
 case "\$1" in
