@@ -1042,7 +1042,7 @@ function install_3proxy {
 	# Move 3proxy program to a non-temporary location and navigate there
 	mv 3proxy /etc/3proxy/
 	cd /etc/3proxy/
-	
+	chown -R nobody:nogroup /etc/3proxy/3proxy
 	# Create a Log File
 	touch /var/log/3proxy.log
 	
@@ -1072,6 +1072,7 @@ users \$/etc/3proxy/.proxyauth
 # Specify daemon as a start mode
 #
 daemon
+pidfile /etc/3proxy/3proxy.pid
 # and the path to logs, and log format. Creation date will be added to a log name
 log /var/log/3proxy.log
 logformat "- +_L%t.%. %N.%p %E %U %C:%c %R:%r %O %I %h %T"
@@ -1106,6 +1107,8 @@ proxy -n -p$1 -a
 #flush
 #allow userdefined
 #socks
+setgid 65534
+setuid 65534
 END
 	
 	# Give appropriate permissions for config file
@@ -1124,6 +1127,7 @@ END
 	touch /etc/init.d/3proxy
 	chmod  +x /etc/init.d/3proxy
 	cat > "/etc/init.d/3proxy" <<END
+#!/bin/sh
 ### BEGIN INIT INFO
 # Provides:          3proxy
 # Required-Start:    \$remote_fs \$syslog
@@ -1134,25 +1138,34 @@ END
 # Description:       Enable service provided by daemon.
 ### END INIT INFO
 
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/etc/3proxy/3proxy
+DAEMON_OPTS=/etc/3proxy/3proxy.cfg
+NAME=3proxy
+DESC=3proxy
+
+test -f \$DAEMON || exit 0
+
+set -e
+
 case "\$1" in
-   start)
-       echo Starting 3Proxy
-
-       /etc/3proxy/3proxy /etc/3proxy/3proxy.cfg
-       ;;
-
-   stop)
-       echo Stopping 3Proxy
-       /usr/bin/killall 3proxy
-       ;;
-
-   restart|reload)
-       echo Reloading 3Proxy
-       /usr/bin/killall -s USR1 3proxy
-       ;;
-   *)
-       echo Usage: \$0 "{start|stop|restart}"
-       exit 1
+  start)
+    echo -n "Starting \$DESC: "
+    start-stop-daemon --start --quiet --pidfile /etc/3proxy/\$NAME.pid \
+        --exec \$DAEMON \$DAEMON_OPTS
+    echo "done."
+    ;;
+  stop)
+    echo -n "Stopping \$DESC: "
+    start-stop-daemon --stop --quiet --pidfile /etc/3proxy/\$NAME.pid \
+        --exec \$DAEMON
+    echo "done."
+    ;;
+  *)
+    N=/etc/init.d/\$NAME
+    echo "Usage: \$N {start|stop}" >&2
+    exit 1
+    ;;
 esac
 exit 0
 
